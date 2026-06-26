@@ -1,0 +1,1998 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>spidimxnrr — arte sonoro</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=IBM+Plex+Mono:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+/* ── RESET & BASE ── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg:    #070709;
+  --sur:   #0e0e12;
+  --sur2:  #141418;
+  --txt:   #e2ddd6;
+  --txt2:  #6a6a74;
+  --acc:   #6fc3d8;
+  --acc2:  #3a7a8c;
+  --line:  #1e1e24;
+  --red:   #9a3a28;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--txt);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 14px;
+  line-height: 1.7;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── VIEWS ── */
+.view { display: none; min-height: 100vh; }
+.view.active { display: block; }
+
+/* ── NAV ── */
+/* ── RADIO BAR ── */
+#radio-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 110;
+  height: 38px;
+  background: #6fc3d8;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+#radio-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#radio-play {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #070709;
+  color: #6fc3d8;
+  border: none;
+  cursor: pointer;
+  font-size: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s;
+  flex-shrink: 0;
+}
+#radio-play:hover { transform: scale(1.1); }
+
+#radio-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #070709;
+  animation: radioPulse 1.4s ease-in-out infinite;
+  flex-shrink: 0;
+}
+@keyframes radioPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+#radio-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: #070709;
+  flex-shrink: 0;
+}
+
+#radio-status {
+  font-size: 10px;
+  color: rgba(7,7,9,0.65);
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#radio-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+#radio-volume {
+  width: 70px;
+  height: 3px;
+  accent-color: #070709;
+  cursor: pointer;
+}
+
+#radio-mute {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  color: #070709;
+  padding: 0;
+  line-height: 1;
+}
+
+@media (max-width: 640px) {
+  #radio-status { display: none; }
+  #radio-volume { width: 50px; }
+}
+
+nav {
+  position: fixed;
+  top: 38px; left: 0; right: 0;
+  z-index: 100;
+  background: rgba(7,7,9,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+  padding: 0 32px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--acc);
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.nav-link {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--txt2);
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: 'IBM Plex Mono', monospace;
+  transition: color 0.2s;
+}
+.nav-link:hover { color: var(--acc); }
+
+.nav-ig {
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  color: var(--acc);
+  text-decoration: none;
+  border: 1px solid var(--acc2);
+  padding: 4px 10px;
+  transition: all 0.2s;
+}
+.nav-ig:hover { background: var(--acc); color: var(--bg); }
+
+/* ── WAVEFORM SVG separator ── */
+.wave-sep {
+  width: 100%;
+  height: 36px;
+  overflow: hidden;
+  opacity: 0.25;
+}
+.wave-sep path {
+  stroke: var(--acc);
+  stroke-width: 1.5;
+  fill: none;
+  stroke-dasharray: 1200;
+  stroke-dashoffset: 1200;
+  animation: drawwave 3s ease forwards;
+}
+@keyframes drawwave {
+  to { stroke-dashoffset: 0; }
+}
+
+/* ── HERO ── */
+.hero {
+  padding: 178px 40px 80px;
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.hero-eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--acc);
+  margin-bottom: 28px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.hero-eyebrow::after {
+  content: '';
+  flex: 1;
+  max-width: 80px;
+  height: 1px;
+  background: var(--acc2);
+}
+
+.hero-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(52px, 9vw, 96px);
+  font-weight: 300;
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+  color: var(--txt);
+  margin-bottom: 32px;
+}
+.hero-title em {
+  font-style: italic;
+  font-weight: 600;
+  color: var(--acc);
+  display: block;
+}
+
+.hero-desc {
+  font-size: 13px;
+  color: var(--txt2);
+  max-width: 460px;
+  line-height: 1.9;
+  margin-bottom: 48px;
+}
+
+/* ── FEATURED ARTICLE ── */
+.featured {
+  padding: 0 40px 80px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.section-label {
+  font-size: 9px;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--txt2);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+.feat-card {
+  background: var(--sur);
+  border: 1px solid var(--line);
+  padding: 40px;
+  cursor: pointer;
+  transition: border-color 0.3s;
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 32px;
+  align-items: end;
+}
+.feat-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--acc);
+}
+.feat-card:hover { border-color: var(--acc2); }
+
+.feat-hz {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--acc);
+  margin-bottom: 16px;
+  font-family: 'IBM Plex Mono', monospace;
+}
+.feat-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(28px, 4.5vw, 44px);
+  font-weight: 300;
+  line-height: 1.1;
+  color: var(--txt);
+  margin-bottom: 16px;
+}
+.feat-title em { font-style: italic; color: var(--acc); }
+.feat-excerpt {
+  font-size: 12px;
+  color: var(--txt2);
+  line-height: 1.8;
+  max-width: 480px;
+}
+.feat-meta {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+  min-width: 100px;
+}
+.feat-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 80px;
+  color: var(--sur2);
+  line-height: 1;
+  font-weight: 300;
+}
+.feat-tag {
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--txt2);
+  border: 1px solid var(--line);
+  padding: 3px 8px;
+}
+.feat-read {
+  font-size: 10px;
+  color: var(--acc);
+  letter-spacing: 0.1em;
+  margin-top: 8px;
+}
+
+/* ── ARTICLE GRID ── */
+.articles {
+  padding: 0 40px 100px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.art-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--line);
+}
+
+.art-card {
+  background: var(--bg);
+  padding: 32px;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+}
+.art-card:hover { background: var(--sur); }
+
+.art-hz {
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--acc);
+}
+.art-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--txt);
+}
+.art-title em { font-style: italic; color: var(--acc); }
+.art-excerpt {
+  font-size: 11px;
+  color: var(--txt2);
+  line-height: 1.8;
+  flex: 1;
+}
+.art-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  margin-top: auto;
+}
+.art-date { font-size: 9px; color: var(--txt2); letter-spacing: 0.1em; }
+.art-arrow { font-size: 11px; color: var(--acc); }
+
+/* ── ABOUT STRIP ── */
+.about-strip {
+  border-top: 1px solid var(--line);
+  padding: 60px 40px;
+  max-width: 900px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: center;
+}
+.about-label {
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--txt2);
+  margin-bottom: 16px;
+}
+.about-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  font-weight: 300;
+  line-height: 1.6;
+  color: var(--txt);
+}
+.about-text em { font-style: italic; color: var(--acc); }
+.about-links { display: flex; flex-direction: column; gap: 12px; }
+.about-link {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border: 1px solid var(--line);
+  text-decoration: none;
+  color: var(--txt2);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+.about-link:hover { border-color: var(--acc); color: var(--acc); }
+
+/* ── FOOTER ── */
+footer {
+  border-top: 1px solid var(--line);
+  padding: 28px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.footer-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16px;
+  color: var(--acc);
+}
+.footer-copy {
+  font-size: 9px;
+  color: var(--txt2);
+  letter-spacing: 0.1em;
+}
+
+/* ── ARTICLE VIEW ── */
+#article-view {
+  padding-top: 90px;
+}
+
+.art-hero {
+  padding: 64px 40px 48px;
+  max-width: 740px;
+  margin: 0 auto;
+  border-bottom: 1px solid var(--line);
+}
+
+.art-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--txt2);
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: 'IBM Plex Mono', monospace;
+  margin-bottom: 40px;
+  transition: color 0.2s;
+}
+.art-back:hover { color: var(--acc); }
+
+.art-hz-big {
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--acc);
+  margin-bottom: 20px;
+}
+
+.art-title-big {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(36px, 6vw, 64px);
+  font-weight: 300;
+  line-height: 1.0;
+  letter-spacing: -0.02em;
+  color: var(--txt);
+  margin-bottom: 20px;
+}
+.art-title-big em { font-style: italic; color: var(--acc); }
+
+.art-meta-row {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  font-size: 10px;
+  color: var(--txt2);
+  letter-spacing: 0.1em;
+  margin-top: 24px;
+}
+.art-meta-row span::before { content: '—  '; }
+
+/* ── ARTICLE BODY ── */
+.art-body {
+  padding: 56px 40px 80px;
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.art-body p {
+  font-size: 15px;
+  line-height: 1.95;
+  color: rgba(226, 221, 214, 0.8);
+  margin-bottom: 28px;
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300;
+}
+
+.art-body p strong {
+  color: var(--txt);
+  font-weight: 600;
+}
+
+.art-body p em {
+  font-style: italic;
+  color: var(--acc);
+}
+
+.art-body h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px;
+  font-weight: 400;
+  color: var(--txt);
+  margin: 48px 0 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.art-body blockquote {
+  border-left: 3px solid var(--acc);
+  padding: 20px 28px;
+  margin: 36px 0;
+  background: var(--sur);
+}
+.art-body blockquote p {
+  font-size: 20px;
+  color: var(--txt);
+  font-style: italic;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.art-body .data-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--line);
+  margin: 36px 0;
+}
+.art-body .data-cell {
+  background: var(--sur);
+  padding: 20px 16px;
+  text-align: center;
+}
+.art-body .data-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px;
+  color: var(--acc);
+  display: block;
+  margin-bottom: 4px;
+}
+.art-body .data-label {
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--txt2);
+}
+
+.art-body .wave-sep { margin: 40px 0; }
+
+.art-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 48px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+}
+.art-tag-chip {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: var(--txt2);
+  border: 1px solid var(--line);
+  padding: 4px 10px;
+  transition: all 0.2s;
+}
+.art-tag-chip:hover { border-color: var(--acc); color: var(--acc); }
+
+/* ── NEXT ARTICLE ── */
+.art-next {
+  border-top: 1px solid var(--line);
+  padding: 40px;
+  max-width: 740px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.art-next:hover { background: var(--sur); }
+.art-next-label {
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--txt2);
+  margin-bottom: 8px;
+}
+.art-next-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  color: var(--txt);
+}
+.art-next-arrow { font-size: 24px; color: var(--acc); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 640px) {
+  nav { padding: 0 20px; }
+  .hero, .featured, .articles, .about-strip, footer, .art-hero, .art-body, .art-next { padding-left: 20px; padding-right: 20px; }
+  .art-grid { grid-template-columns: 1fr; }
+  .feat-card { grid-template-columns: 1fr; }
+  .feat-meta { align-items: flex-start; flex-direction: row; }
+  .feat-num { display: none; }
+  .about-strip { grid-template-columns: 1fr; }
+  footer { flex-direction: column; gap: 12px; text-align: center; }
+  .art-meta-row { flex-direction: column; gap: 6px; align-items: flex-start; }
+  .nav-right { gap: 14px; }
+  .nav-link { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wave-sep path { animation: none; stroke-dashoffset: 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══ RADIO EN VIVO ══ -->
+<div id="radio-bar">
+  <div id="radio-left">
+    <button id="radio-play" onclick="toggleRadio()" title="Reproducir/Pausar">
+      <span id="radio-play-icon">▶</span>
+    </button>
+    <div id="radio-live-dot"></div>
+    <span id="radio-label">EN VIVO</span>
+    <span id="radio-status">spidimxnrr radio</span>
+  </div>
+  <div id="radio-right">
+    <input type="range" id="radio-volume" min="0" max="1" step="0.01" value="0.8" oninput="setRadioVolume(this.value)">
+    <button id="radio-mute" onclick="toggleMute()" title="Silenciar">🔊</button>
+  </div>
+  <audio id="radio-audio" preload="none">
+    <source src="https://stream.zeno.fm/f0vg3fj7udvvv" type="audio/mpeg">
+  </audio>
+</div>
+
+<!-- ══ NAV ══ -->
+<nav>
+  <button class="nav-logo" id="nav-logo-btn" onclick="showHome()">spidimxnrr</button>
+  <div class="nav-right">
+    <button class="nav-link" onclick="showHome()">Artículos</button>
+    <button class="nav-link" onclick="scrollToAbout()">Sobre mí</button>
+    <a class="nav-ig" href="https://instagram.com/spidimxnrr" target="_blank">↗ Instagram</a>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════
+     HOME VIEW
+══════════════════════════════════════ -->
+<div id="home-view" class="view active">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-eyebrow">Arte Sonoro · Acústica Experimental</div>
+    <h1 class="hero-title">
+      El sonido<br>que <em>habitas</em><br>te define.
+    </h1>
+    <p class="hero-desc">
+      Escritura sobre arte sonoro, acústica medioambiental y la relación entre el entorno acústico y la calidad de vida. Frecuencias, silencio, resonancia corporal.
+    </p>
+    <svg class="wave-sep" viewBox="0 0 900 36" preserveAspectRatio="none">
+      <path d="M0,18 C37,18 37,4 75,4 C112,4 112,32 150,32 C187,32 187,4 225,4 C262,4 262,32 300,32 C337,32 337,4 375,4 C412,4 412,32 450,32 C487,32 487,4 525,4 C562,4 562,32 600,32 C637,32 637,4 675,4 C712,4 712,32 750,32 C787,32 787,4 825,4 C862,4 862,32 900,32"/>
+    </svg>
+  </section>
+
+  <!-- FEATURED -->
+  <section class="featured">
+    <div class="section-label">Artículo destacado</div>
+    <div class="feat-card" onclick="openArticle(0)">
+      <div>
+        <div class="feat-hz">7.83 Hz · Paisaje Sonoro Urbano</div>
+        <h2 class="feat-title">La ciudad respira<br><em>a tu sistema nervioso.</em></h2>
+        <p class="feat-excerpt">El ruido de fondo no es ruido. Cada entorno tiene una frecuencia invisible que modula tu cuerpo antes de que tu mente lo note — el zumbido del transformador, la reverberación de la plaza vacía, el silencio activo de las 3am.</p>
+      </div>
+      <div class="feat-meta">
+        <span class="feat-num">01</span>
+        <span class="feat-tag">Paisaje</span>
+        <span class="feat-read">Leer artículo →</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ARTICLE GRID -->
+  <section class="articles">
+    <div class="section-label">Todos los artículos</div>
+    <div class="art-grid">
+
+      <div class="art-card" onclick="openArticle(1)">
+        <div class="art-hz">Silencio · Experimental</div>
+        <div class="art-title">El silencio<br><em>tiene textura.</em></div>
+        <div class="art-excerpt">El silencio absoluto no existe en la naturaleza. Existe la reducción. El espacio entre dos eventos sonoros que el cerebro llena activamente — con memoria, con expectativa, con miedo.</div>
+        <div class="art-bottom">
+          <span class="art-date">Jun 2025</span>
+          <span class="art-arrow">→</span>
+        </div>
+      </div>
+
+      <div class="art-card" onclick="openArticle(2)">
+        <div class="art-hz">528 Hz · Resonancia Corporal</div>
+        <div class="art-title">Tu cuerpo es una<br><em>caja de resonancia.</em></div>
+        <div class="art-excerpt">No escuchas solo con los oídos. El sonido entra por la piel, por los huesos, por la cavidad torácica. Una frecuencia baja y sostenida puede alterar tu ritmo cardíaco antes de que tu cerebro la registre.</div>
+        <div class="art-bottom">
+          <span class="art-date">May 2025</span>
+          <span class="art-arrow">→</span>
+        </div>
+      </div>
+
+      <div class="art-card" onclick="openArticle(3)">
+        <div class="art-hz">Nervio Vago · Bienestar</div>
+        <div class="art-title">El nervio que<br><em>escucha por ti.</em></div>
+        <div class="art-excerpt">El nervio vago conecta el oído con casi todos los órganos. Es el cable invisible por donde el sonido reorganiza tu biología. Aprende a activarlo deliberadamente.</div>
+        <div class="art-bottom">
+          <span class="art-date">Abr 2025</span>
+          <span class="art-arrow">→</span>
+        </div>
+      </div>
+
+      <div class="art-card" onclick="openArticle(4)">
+        <div class="art-hz">Arte Sonoro · Historia</div>
+        <div class="art-title">John Cage y el<br><em>arte de no hacer nada.</em></div>
+        <div class="art-excerpt">4'33" no es una obra de silencio. Es una obra sobre la escucha. La audiencia en 1952 tosió, se movió, susurró — y sin saberlo, se convirtió en el instrumento.</div>
+        <div class="art-bottom">
+          <span class="art-date">Mar 2025</span>
+          <span class="art-arrow">→</span>
+        </div>
+      </div>
+
+      <div class="art-card" onclick="openArticle(5)">
+        <div class="art-hz">Acústica · Arquitectura</div>
+        <div class="art-title">Los espacios que<br><em>cambian tu mente.</em></div>
+        <div class="art-excerpt">Una catedral ralentiza tu respiración. Un túnel de metro te pone en alerta. La acústica arquitectónica es diseño emocional — a menudo inconsciente, siempre efectivo.</div>
+        <div class="art-bottom">
+          <span class="art-date">Feb 2025</span>
+          <span class="art-arrow">→</span>
+        </div>
+      </div>
+
+      <div class="art-card" onclick="openArticle(6)">
+        <div class="art-hz">7.83 Hz · Schumann</div>
+        <div class="art-title">La frecuencia<br><em>del planeta.</em></div>
+        <div class="art-excerpt">La Tierra resuena a 7.83 Hz — la resonancia Schumann. Tus ondas cerebrales en estado de meditación profunda vibran en el mismo rango. No es coincidencia; es coevolución.</div>
+        <div class="art-bottom">
+          <span class="art-date">Ene 2025</span>
+          <span class="art-arrow">→</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="about-strip" id="about-section">
+    <div>
+      <p class="about-label">Sobre este espacio</p>
+      <p class="about-text">
+        Escritura en el límite entre <em>el arte, la ciencia</em> y el bienestar. El sonido como materia viva.
+      </p>
+    </div>
+    <div class="about-links">
+      <a class="about-link" href="https://instagram.com/spidimxnrr" target="_blank">
+        <span>Instagram</span><span>↗</span>
+      </a>
+      <a class="about-link" href="mailto:hola@spidimxnrr.com">
+        <span>Contacto</span><span>→</span>
+      </a>
+      <div class="about-link" style="cursor:default">
+        <span>Frecuencia de publicación</span><span>Semanal</span>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span class="footer-logo">spidimxnrr</span>
+    <span class="footer-copy">Arte sonoro · Acústica medioambiental · 2025</span>
+  </footer>
+
+</div><!-- /home-view -->
+
+
+<!-- ══════════════════════════════════════
+     ARTICLE VIEW
+══════════════════════════════════════ -->
+<div id="article-view" class="view">
+
+  <div class="art-hero">
+    <button class="art-back" onclick="showHome()">← Volver a artículos</button>
+    <div class="art-hz-big" id="art-hz"></div>
+    <h1 class="art-title-big" id="art-title"></h1>
+    <div class="art-meta-row">
+      <span id="art-date"></span>
+      <span id="art-read"></span>
+    </div>
+  </div>
+
+  <div class="art-body" id="art-body"></div>
+
+  <div class="art-next" id="art-next-card" onclick="openNextArticle()">
+    <div>
+      <div class="art-next-label">Siguiente artículo</div>
+      <div class="art-next-title" id="art-next-title"></div>
+    </div>
+    <div class="art-next-arrow">→</div>
+  </div>
+
+  <footer style="max-width:740px">
+    <span class="footer-logo">spidimxnrr</span>
+    <span class="footer-copy">Arte sonoro · Acústica medioambiental · 2025</span>
+  </footer>
+
+</div><!-- /article-view -->
+
+
+<script>
+/* ── DATA ── */
+const articles = [
+  {
+    hz: "7.83 Hz · Paisaje Sonoro Urbano",
+    title: "La ciudad respira<br><em>a tu sistema nervioso.</em>",
+    date: "Junio 2025",
+    read: "6 min de lectura",
+    body: `
+      <p>El ruido de fondo no es ruido. Es la ciudad respirando.</p>
+      <p>Cada entorno tiene una <strong>frecuencia que regula tu sistema nervioso</strong> sin que lo notes — la textura del aire en un túnel, el zumbido constante de un transformador, la reverberación de una plaza vacía a las 3am. Tu cuerpo lleva la cuenta incluso cuando tu mente no presta atención.</p>
+      <blockquote><p>"Escuchar el espacio es una forma de habitarlo."</p></blockquote>
+      <h2>La acústica como ecología invisible</h2>
+      <p>La acústica medioambiental no estudia solo el ruido: estudia la <em>relación entre un cuerpo y su entorno sonoro</em>. Esa relación es bidireccional y permanente. No puedes salir del paisaje sonoro de la misma manera en que no puedes salir del aire que respiras.</p>
+      <p>El transformador que zumba a 60Hz modifica tu tensión muscular. Esa reverb larga de la catedral ralentiza tu respiración. El silencio blanco de una biblioteca organiza tu atención. Ninguno de estos efectos requiere que seas consciente de ellos para funcionar.</p>
+      <div class="data-row">
+        <div class="data-cell"><span class="data-val">60 Hz</span><span class="data-label">Red eléctrica urbana</span></div>
+        <div class="data-cell"><span class="data-val">4–8 Hz</span><span class="data-label">Ondas theta cerebrales</span></div>
+        <div class="data-cell"><span class="data-val">7.83 Hz</span><span class="data-label">Resonancia Schumann</span></div>
+      </div>
+      <h2>No estás escuchando la ciudad</h2>
+      <p>La ciudad te está leyendo a ti. La exposición crónica a entornos de alta densidad sonora — tráfico, construcción, notificaciones — eleva los niveles de cortisol, reduce la variabilidad de la frecuencia cardíaca y comprime el campo de atención.</p>
+      <p>Esto no es metáfora. Es <em>fisiología medible</em>. Y en sentido contrario: los entornos sonoros diseñados con atención — parques con agua corriente, interiores con absorción controlada, barrios con densidad acústica baja — producen efectos restauradores documentados en el sistema nervioso autónomo.</p>
+      <svg class="wave-sep" viewBox="0 0 700 36" preserveAspectRatio="none"><path d="M0,18 C29,18 29,4 58,4 C87,4 87,32 116,32 C145,32 145,4 174,4 C203,4 203,32 232,32 C261,32 261,4 290,4 C319,4 319,32 348,32 C377,32 377,4 406,4 C435,4 435,32 464,32 C493,32 493,4 522,4 C551,4 551,32 580,32 C609,32 609,4 638,4 C667,4 667,32 700,32"/></svg>
+      <h2>¿Qué puedes hacer?</h2>
+      <p>La respuesta no es el aislamiento, sino la <strong>consciencia acústica</strong>. Aprender a escuchar el espacio — no para eliminarlo, sino para relacionarte con él de manera deliberada. Identificar qué frecuencias te activan, cuáles te calman, cuáles te agotan.</p>
+      <p>¿Cuándo fue la última vez que prestaste atención al sonido del lugar donde estás?</p>
+      <div class="art-tags">
+        <span class="art-tag-chip">#paisajesonoro</span>
+        <span class="art-tag-chip">#acústica</span>
+        <span class="art-tag-chip">#bienestar</span>
+        <span class="art-tag-chip">#sistemanerviosa</span>
+        <span class="art-tag-chip">#soundscape</span>
+      </div>
+    `
+  },
+  {
+    hz: "Silencio · Arte Experimental",
+    title: "El silencio<br><em>tiene textura.</em>",
+    date: "Junio 2025",
+    read: "5 min de lectura",
+    body: `
+      <p>El silencio absoluto no existe en la naturaleza. Existe la reducción. La sustracción. El espacio entre dos eventos sonoros que el cerebro llena de manera activa — con memoria, con expectativa, con miedo.</p>
+      <p>En 1952, John Cage se sentó frente a un piano y no tocó nada durante 4 minutos y 33 segundos. La audiencia escuchó lluvia, aire acondicionado, sus propias sillas, su propio pulso. <em>La sala era el instrumento.</em></p>
+      <blockquote><p>"Cuando una sala enmudece, el sonido no desaparece. Se vuelve interno."</p></blockquote>
+      <h2>La sala anecoica</h2>
+      <p>El lugar más silencioso del mundo — la sala anecoica de Orfield Laboratories en Minneapolis — mide −9.4 dB. Por debajo del umbral de audición humana. Nadie ha podido permanecer más de 45 minutos en ella sin experimentar alucinaciones auditivas.</p>
+      <p>El cerebro, privado de input externo, <strong>genera su propio sonido</strong>. Escuchas tu sangre circulando. Tu sistema nervioso funcionando. El eco de tu propio cuerpo.</p>
+      <div class="data-row">
+        <div class="data-cell"><span class="data-val">4'33"</span><span class="data-label">John Cage, 1952</span></div>
+        <div class="data-cell"><span class="data-val">−9.4 dB</span><span class="data-label">Sala anecoica</span></div>
+        <div class="data-cell"><span class="data-val">45 min</span><span class="data-label">Máximo tolerable</span></div>
+      </div>
+      <h2>El silencio como práctica</h2>
+      <p>Las tradiciones contemplativas de todo el mundo han sabido esto por milenios: el silencio no es ausencia, es <em>presencia de otra cosa</em>. Presencia del cuerpo, de la mente sin filtro, del entorno sin mediación.</p>
+      <p>En la práctica del arte sonoro experimental, el silencio es un material más — tan válido como un acorde o un ruido industrial. La pregunta no es si hay sonido, sino quién lo produce y quién lo escucha.</p>
+      <div class="art-tags">
+        <span class="art-tag-chip">#silencio</span>
+        <span class="art-tag-chip">#johncage</span>
+        <span class="art-tag-chip">#artesonoro</span>
+        <span class="art-tag-chip">#experimental</span>
+      </div>
+    `
+  },
+  {
+    hz: "528 Hz · Resonancia Corporal",
+    title: "Tu cuerpo es una<br><em>caja de resonancia.</em>",
+    date: "Mayo 2025",
+    read: "7 min de lectura",
+    body: `
+      <p>No escuchas solo con los oídos. El sonido entra por la piel, por los huesos, por la cavidad torácica. Una frecuencia baja y sostenida puede alterar tu ritmo cardíaco antes de que tu cerebro la registre conscientemente.</p>
+      <p>Esto tiene un nombre: <strong>conducción ósea</strong>. Y también: resonancia simpática. Tu cuerpo no es un receptor pasivo del sonido — es un instrumento que responde, que amplifica ciertas frecuencias y amortigua otras.</p>
+      <blockquote><p>"El arte sonoro experimental no es solo estética. Es una exploración de cómo el ambiente acústico construye o destruye el bienestar desde adentro."</p></blockquote>
+      <h2>Frecuencias documentadas</h2>
+      <div class="data-row">
+        <div class="data-cell"><span class="data-val">7.83Hz</span><span class="data-label">Resonancia terrestre</span></div>
+        <div class="data-cell"><span class="data-val">40Hz</span><span class="data-label">Coherencia cognitiva</span></div>
+        <div class="data-cell"><span class="data-val">528Hz</span><span class="data-label">Reparación celular</span></div>
+      </div>
+      <p>La frecuencia de 528 Hz aparece en investigaciones de etnomusicología experimental y terapia sonora como potencialmente relacionada con procesos de reparación. No es magia — es física: ciertas frecuencias producen resonancias en tejidos que pueden alterar su comportamiento.</p>
+      <h2>El diseño sonoro como medicina</h2>
+      <p>Los hospitales empiezan a integrar esta comprensión. El <em>diseño acústico hospitalario</em> ya no considera solo la reducción del ruido — considera la introducción deliberada de frecuencias que apoyen la recuperación, la reducción del estrés y la coherencia del sistema nervioso autónomo.</p>
+      <p>¿Qué entorno sonoro estás eligiendo para tu cuerpo hoy?</p>
+      <div class="art-tags">
+        <span class="art-tag-chip">#resonancia</span>
+        <span class="art-tag-chip">#frecuencias</span>
+        <span class="art-tag-chip">#terapiasonora</span>
+        <span class="art-tag-chip">#bienestar</span>
+      </div>
+    `
+  },
+  {
+    hz: "Nervio Vago · Bienestar Sonoro",
+    title: "El nervio que<br><em>escucha por ti.</em>",
+    date: "Abril 2025",
+    read: "5 min de lectura",
+    body: `
+      <p>El nervio vago es el cable más largo del sistema nervioso autónomo. Sale del tronco cerebral, pasa por el oído, desciende por el cuello, atraviesa el pecho y llega hasta el abdomen. Conecta el cerebro con casi todos los órganos.</p>
+      <p>Lo que pocas veces se dice: <strong>el oído es una de sus entradas principales</strong>. Ciertas frecuencias auditivas — especialmente en el rango de 80 a 500 Hz — activan la rama parasimpática del sistema nervioso a través del nervio vago. El resultado es una reducción medible de la respuesta de estrés.</p>
+      <blockquote><p>"No estás eligiendo música. Estás eligiendo qué estado biológico habitar."</p></blockquote>
+      <h2>Tono vagal y salud</h2>
+      <p>El tono vagal alto — es decir, un nervio vago bien activado y funcionando — se asocia a mayor variabilidad de la frecuencia cardíaca, mejor regulación emocional, menor inflamación crónica y recuperación más rápida del estrés.</p>
+      <p>Y el sonido es una de las formas más directas de influir en él. <em>Cantar, tararear, escuchar música con frecuencias graves sostenidas, o simplemente prestar atención consciente a sonidos naturales</em> activa este sistema de forma medible.</p>
+      <div class="art-tags">
+        <span class="art-tag-chip">#nerviavago</span>
+        <span class="art-tag-chip">#bienestar</span>
+        <span class="art-tag-chip">#sistemanerviosa</span>
+        <span class="art-tag-chip">#terapiasonora</span>
+      </div>
+    `
+  },
+  {
+    hz: "Arte Sonoro · Historia",
+    title: "John Cage y el<br><em>arte de no hacer nada.</em>",
+    date: "Marzo 2025",
+    read: "6 min de lectura",
+    body: `
+      <p>El 29 de agosto de 1952, en el Maverick Concert Hall de Woodstock, Nueva York, el pianista David Tudor se sentó frente a un piano de cola, abrió la tapa del teclado, esperó cuatro minutos y treinta y tres segundos, y la cerró. No tocó una sola nota.</p>
+      <p>La obra se llamaba 4'33". Su compositor era John Cage. Y cambió la música para siempre.</p>
+      <blockquote><p>"No hay tal cosa como el silencio. Siempre hay algo que escuchar."</p></blockquote>
+      <h2>Lo que realmente propuso Cage</h2>
+      <p>4'33" no es una provocación nihilista. Es una <strong>redefinición radical de qué constituye música</strong>. Cage proponía que cualquier sonido — planeado o accidental, producido o ambiental — es material musical si se escucha con atención musical.</p>
+      <p>La audiencia en 1952 escuchó viento, lluvia que empezaba afuera, el crujido de sus sillas, sus propias respiraciones. Algunos se fueron furiosos. Otros entendieron que acababan de participar en algo que no tenían palabras para describir todavía.</p>
+      <p>Cage había estudiado con Arnold Schoenberg, había investigado el budismo zen con D.T. Suzuki, había explorado el I Ching como herramienta compositiva. Todo confluyó en una obra que dura menos de cinco minutos y que expandió permanentemente los límites de lo que podemos llamar música.</p>
+      <div class="data-row">
+        <div class="data-cell"><span class="data-val">1952</span><span class="data-label">Premiere de 4'33"</span></div>
+        <div class="data-cell"><span class="data-val">3 mov.</span><span class="data-label">Estructura de la obra</span></div>
+        <div class="data-cell"><span class="data-val">∞</span><span class="data-label">Versiones posibles</span></div>
+      </div>
+      <div class="art-tags">
+        <span class="art-tag-chip">#johncage</span>
+        <span class="art-tag-chip">#artesonoro</span>
+        <span class="art-tag-chip">#historia</span>
+        <span class="art-tag-chip">#experimental</span>
+      </div>
+    `
+  },
+  {
+    hz: "Acústica · Arquitectura",
+    title: "Los espacios que<br><em>cambian tu mente.</em>",
+    date: "Febrero 2025",
+    read: "5 min de lectura",
+    body: `
+      <p>Una catedral gótica tiene un tiempo de reverberación de entre 6 y 10 segundos. Eso significa que un sonido tarda ese tiempo en extinguirse tras ser producido. El efecto sobre el sistema nervioso es inmediato y measurable: la respiración se ralentiza, la atención se expande, el sentido del tiempo se altera.</p>
+      <p>Los constructores de catedrales no sabían de neurociencia. Pero sabían — intuitivamente, empíricamente — que cierta acústica producía cierto estado interior. <em>Diseñaron el sonido antes de diseñar la piedra.</em></p>
+      <blockquote><p>"La arquitectura es música congelada. La acústica es la arquitectura en movimiento."</p></blockquote>
+      <h2>Diseño acústico deliberado</h2>
+      <p>Hoy existe la disciplina del <strong>diseño acústico arquitectónico</strong>. No se trata solo de controlar el ruido — se trata de crear entornos sonoros que apoyen la función y el estado emocional de quienes los habitan.</p>
+      <p>Un hospital bien diseñado acústicamente reduce el tiempo de recuperación. Una oficina con absorción controlada aumenta la concentración. Un espacio educativo con tiempos de reverberación adecuados mejora la comprensión.</p>
+      <p>El sonido no está separado del espacio. El sonido <em>es</em> el espacio, experimentado en el tiempo.</p>
+      <div class="art-tags">
+        <span class="art-tag-chip">#acústica</span>
+        <span class="art-tag-chip">#arquitectura</span>
+        <span class="art-tag-chip">#diseño</span>
+        <span class="art-tag-chip">#bienestar</span>
+      </div>
+    `
+  },
+  {
+    hz: "7.83 Hz · Resonancia Schumann",
+    title: "La frecuencia<br><em>del planeta.</em>",
+    date: "Enero 2025",
+    read: "6 min de lectura",
+    body: `
+      <p>En 1952, el físico Winfried Otto Schumann calculó que la cavidad entre la superficie de la Tierra y la ionosfera actuaría como una guía de ondas electromagnéticas con una frecuencia de resonancia fundamental de aproximadamente 7.83 Hz.</p>
+      <p>Tenía razón. Las resonancias Schumann son reales, medibles, y persistentes. Y tus ondas cerebrales en estado de meditación profunda o sueño theta vibran en exactamente ese rango.</p>
+      <blockquote><p>"No es coincidencia. Es coevolución. La vida en la Tierra ha evolucionado dentro de este campo electromagnético durante millones de años."</p></blockquote>
+      <h2>El campo que te envuelve</h2>
+      <p>Las resonancias Schumann no son audibles — están muy por debajo del umbral de audición humana. Pero el cuerpo las detecta. Investigaciones en cronobiología y electrofisiología sugieren que este campo influye en los ritmos circadianos, la sincronización neural y la variabilidad de la frecuencia cardíaca.</p>
+      <p>Cuando practicas meditación profunda, cuando experimentas estados de flow, cuando descansas en un entorno natural lejos de interferencias electromagnéticas artificiales — tu cerebro se sincroniza con la frecuencia de la Tierra. <em>No metafóricamente. Literalmente.</em></p>
+      <div class="data-row">
+        <div class="data-cell"><span class="data-val">7.83Hz</span><span class="data-label">Frecuencia fundamental</span></div>
+        <div class="data-cell"><span class="data-val">1952</span><span class="data-label">Descubrimiento teórico</span></div>
+        <div class="data-cell"><span class="data-val">4–8Hz</span><span class="data-label">Ondas theta cerebrales</span></div>
+      </div>
+      <div class="art-tags">
+        <span class="art-tag-chip">#schumann</span>
+        <span class="art-tag-chip">#frecuencias</span>
+        <span class="art-tag-chip">#meditacion</span>
+        <span class="art-tag-chip">#ciencia</span>
+      </div>
+    `
+  }
+];
+
+let currentArticleIndex = 0;
+
+function showHome() {
+  document.getElementById('home-view').classList.add('active');
+  document.getElementById('article-view').classList.remove('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function openArticle(index) {
+  currentArticleIndex = index;
+  const a = articles[index];
+
+  document.getElementById('art-hz').textContent = a.hz;
+  document.getElementById('art-title').innerHTML = a.title;
+  document.getElementById('art-date').textContent = a.date;
+  document.getElementById('art-read').textContent = a.read;
+  document.getElementById('art-body').innerHTML = a.body;
+
+  // Next article
+  const nextIndex = (index + 1) % articles.length;
+  const nextTitle = articles[nextIndex].title.replace(/<br>/g, ' ').replace(/<em>/g, '').replace(/<\/em>/g, '');
+  document.getElementById('art-next-title').innerHTML = articles[nextIndex].title;
+
+  document.getElementById('home-view').classList.remove('active');
+  document.getElementById('article-view').classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'instant' });
+}
+
+function openNextArticle() {
+  openArticle((currentArticleIndex + 1) % articles.length);
+}
+
+function scrollToAbout() {
+  showHome();
+  setTimeout(() => {
+    document.getElementById('about-section').scrollIntoView({ behavior: 'smooth' });
+  }, 100);
+}
+</script>
+</body>
+</html>
+
+<!-- ══════════════════════════════════════
+     EDITOR PANEL (toggle con botón flotante)
+══════════════════════════════════════ -->
+
+<!-- Botón flotante para abrir editor (oculto hasta desbloquear) -->
+<button id="edit-toggle" onclick="toggleEditor()" title="Modo edición" style="display:none">
+  ✎
+</button>
+
+<!-- Panel lateral de edición -->
+<div id="editor-panel">
+  <div id="editor-header">
+    <span id="editor-title-label">Editor de contenido</span>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="ed-btn ed-save" onclick="saveArticle()">Guardar</button>
+      <button class="ed-btn ed-close" onclick="toggleEditor()">✕</button>
+    </div>
+  </div>
+
+  <!-- Selector de artículo -->
+  <div class="ed-section">
+    <div class="ed-label">Artículo a editar</div>
+    <select id="ed-article-select" onchange="loadArticleInEditor()">
+      <option value="-1">— Página principal (Hero) —</option>
+    </select>
+  </div>
+
+  <!-- Campos dinámicos -->
+  <div id="ed-fields"></div>
+
+  <!-- Export -->
+  <div class="ed-section" style="margin-top:auto;border-top:1px solid #1e1e24;padding-top:16px">
+    <div class="ed-label" style="margin-bottom:10px">Exportar blog</div>
+    <button class="ed-btn ed-export" onclick="exportHTML()" style="width:100%">
+      ↓ Descargar HTML actualizado
+    </button>
+    <button class="ed-btn" onclick="openHTMLInTab()" style="width:100%;margin-top:8px;border-color:#1e1e24;color:#6a6a74">
+      ↗ Abrir en pestaña nueva
+    </button>
+    <p style="font-size:9px;color:#4a4a52;margin-top:8px;line-height:1.6;letter-spacing:.05em">
+      Si la descarga no funciona, usa "Abrir en pestaña nueva" y guarda desde ahí (Ctrl/Cmd+S, o mantén presionado y elige Guardar).
+    </p>
+  </div>
+</div>
+
+<!-- Overlay -->
+<div id="editor-overlay" onclick="toggleEditor()"></div>
+
+<style>
+/* ── EDIT TOGGLE BUTTON ── */
+#edit-toggle {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 200;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #6fc3d8;
+  color: #070709;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 4px 24px rgba(111,195,216,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  font-family: serif;
+}
+#edit-toggle:hover {
+  background: #fff;
+  transform: scale(1.08);
+}
+#edit-toggle.active {
+  background: #1c1c20;
+  color: #6fc3d8;
+  border: 1px solid #6fc3d8;
+}
+
+/* ── OVERLAY ── */
+#editor-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(7,7,9,0.5);
+  z-index: 210;
+  backdrop-filter: blur(2px);
+}
+#editor-overlay.visible { display: block; }
+
+/* ── PANEL ── */
+#editor-panel {
+  position: fixed;
+  top: 0; right: 0; bottom: 0;
+  width: 360px;
+  max-width: 95vw;
+  background: #0e0e12;
+  border-left: 1px solid #1e1e24;
+  z-index: 220;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  transform: translateX(100%);
+  transition: transform 0.35s cubic-bezier(0.77,0,0.175,1);
+  overflow-y: auto;
+}
+#editor-panel.open { transform: translateX(0); }
+
+#editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #1e1e24;
+  position: sticky;
+  top: 0;
+  background: #0e0e12;
+  z-index: 1;
+}
+#editor-title-label {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #6fc3d8;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+/* ── EDITOR ELEMENTS ── */
+.ed-section {
+  padding: 16px 20px;
+  border-bottom: 1px solid #1e1e24;
+}
+.ed-label {
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #4a4a52;
+  font-family: 'IBM Plex Mono', monospace;
+  margin-bottom: 8px;
+}
+.ed-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 20px;
+  border-bottom: 1px solid #1e1e24;
+}
+.ed-group label {
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #4a4a52;
+  font-family: 'IBM Plex Mono', monospace;
+}
+.ed-group input,
+.ed-group textarea,
+.ed-group select {
+  background: #141418;
+  border: 1px solid #1e1e24;
+  color: #e2ddd6;
+  padding: 9px 12px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  border-radius: 2px;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.2s;
+  resize: vertical;
+}
+.ed-group input:focus,
+.ed-group textarea:focus,
+.ed-group select:focus {
+  border-color: #6fc3d8;
+}
+select#ed-article-select {
+  background: #141418;
+  border: 1px solid #1e1e24;
+  color: #e2ddd6;
+  padding: 9px 12px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  border-radius: 2px;
+  outline: none;
+  width: 100%;
+  cursor: pointer;
+}
+select#ed-article-select:focus { border-color: #6fc3d8; }
+
+/* ── BUTTONS ── */
+.ed-btn {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 7px 14px;
+  border: 1px solid #1e1e24;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: transparent;
+  color: #6a6a74;
+}
+.ed-save {
+  border-color: #6fc3d8;
+  color: #6fc3d8;
+}
+.ed-save:hover { background: #6fc3d8; color: #070709; }
+.ed-close:hover { border-color: #6a6a74; color: #e2ddd6; }
+.ed-export {
+  border-color: #2a4a2a;
+  color: #5ae890;
+  padding: 10px;
+  font-size: 11px;
+}
+.ed-export:hover { background: #5ae890; color: #070709; }
+
+/* ── TOAST ── */
+#ed-toast {
+  position: fixed;
+  bottom: 88px;
+  right: 28px;
+  background: #6fc3d8;
+  color: #070709;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  padding: 10px 18px;
+  z-index: 300;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: all 0.3s;
+  pointer-events: none;
+}
+#ed-toast.show { opacity: 1; transform: translateY(0); }
+
+/* ── PARAGRAPH EDITOR ── */
+.para-item {
+  background: #141418;
+  border: 1px solid #1e1e24;
+  border-radius: 2px;
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+.para-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px;
+  background: #0e0e12;
+  border-bottom: 1px solid #1e1e24;
+}
+.para-type-label {
+  font-size: 8px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #6fc3d8;
+  font-family: 'IBM Plex Mono', monospace;
+}
+.para-del {
+  background: none;
+  border: none;
+  color: #4a4a52;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 0 4px;
+  transition: color 0.2s;
+}
+.para-del:hover { color: #9a3a28; }
+.para-body textarea {
+  background: #141418;
+  border: none;
+  color: #e2ddd6;
+  padding: 10px 12px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  width: 100%;
+  resize: vertical;
+  min-height: 70px;
+  outline: none;
+  line-height: 1.7;
+}
+.para-add-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 4px 0;
+}
+.para-add-btn {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  padding: 4px 10px;
+  border: 1px solid #1e1e24;
+  background: #0e0e12;
+  color: #6a6a74;
+  cursor: pointer;
+  font-family: 'IBM Plex Mono', monospace;
+  transition: all 0.2s;
+  border-radius: 2px;
+}
+.para-add-btn:hover { border-color: #6fc3d8; color: #6fc3d8; }
+</style>
+
+<!-- Password Modal -->
+<div id="pwd-modal">
+  <div id="pwd-box">
+    <div id="pwd-logo">✎</div>
+    <p id="pwd-title">Modo edición</p>
+    <p id="pwd-sub">Ingresa la contraseña para continuar</p>
+    <input
+      type="password"
+      id="pwd-input"
+      placeholder="Contraseña"
+      onkeydown="if(event.key==='Enter')checkPassword(); if(event.key==='Escape')closePwdModal();"
+    />
+    <p id="pwd-error">Contraseña incorrecta</p>
+    <div id="pwd-actions">
+      <button class="ed-btn" onclick="closePwdModal()">Cancelar</button>
+      <button class="ed-btn ed-save" onclick="checkPassword()">Entrar →</button>
+    </div>
+  </div>
+</div>
+
+<style>
+#pwd-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background: rgba(7,7,9,0.85);
+  backdrop-filter: blur(8px);
+  align-items: center;
+  justify-content: center;
+}
+#pwd-modal.visible { display: flex; }
+
+#pwd-box {
+  background: #0e0e12;
+  border: 1px solid #1e1e24;
+  padding: 40px 36px;
+  width: 320px;
+  max-width: 90vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  animation: popIn 0.25s ease;
+}
+@keyframes popIn {
+  from { opacity:0; transform: scale(0.95) translateY(8px); }
+  to   { opacity:1; transform: scale(1) translateY(0); }
+}
+
+#pwd-logo {
+  font-size: 28px;
+  color: #6fc3d8;
+  margin-bottom: 4px;
+}
+#pwd-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  color: #e2ddd6;
+  font-weight: 300;
+}
+#pwd-sub {
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  color: #4a4a52;
+  font-family: 'IBM Plex Mono', monospace;
+  text-align: center;
+  margin-bottom: 8px;
+}
+#pwd-input {
+  width: 100%;
+  background: #141418;
+  border: 1px solid #1e1e24;
+  color: #e2ddd6;
+  padding: 12px 14px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 14px;
+  outline: none;
+  text-align: center;
+  letter-spacing: 0.2em;
+  transition: border-color 0.2s;
+}
+#pwd-input:focus { border-color: #6fc3d8; }
+#pwd-error {
+  font-size: 10px;
+  color: #9a3a28;
+  font-family: 'IBM Plex Mono', monospace;
+  letter-spacing: 0.1em;
+  opacity: 0;
+  transition: opacity 0.3s;
+  height: 14px;
+}
+#pwd-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+  width: 100%;
+  justify-content: flex-end;
+}
+</style>
+
+<div id="ed-toast">✓ Cambios guardados</div>
+
+<script>
+/* ══════════════════════════════
+   EDITOR LOGIC
+══════════════════════════════ */
+
+let editorOpen = false;
+let editingIndex = -1; // -1 = home
+
+let editorUnlocked = false;
+
+function toggleEditor() {
+  if (!editorOpen && !editorUnlocked) {
+    showPasswordPrompt();
+    return;
+  }
+  editorOpen = !editorOpen;
+  document.getElementById('editor-panel').classList.toggle('open', editorOpen);
+  document.getElementById('editor-overlay').classList.toggle('visible', editorOpen);
+  document.getElementById('edit-toggle').classList.toggle('active', editorOpen);
+  if (editorOpen) {
+    buildArticleSelect();
+    loadArticleInEditor();
+  }
+}
+
+/* ── Acceso oculto al editor ──
+   Desktop: Ctrl/Cmd + Shift + E
+   Móvil/touch: mantener presionado el logo "spidimxnrr" ~1.2s */
+
+document.addEventListener('keydown', function(e) {
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'e') {
+    e.preventDefault();
+    showPasswordPrompt();
+  }
+});
+
+(function setupLongPress() {
+  const logo = document.getElementById('nav-logo-btn');
+  if (!logo) return;
+  let pressTimer = null;
+  let triggered = false;
+
+  function startPress(e) {
+    triggered = false;
+    pressTimer = setTimeout(() => {
+      triggered = true;
+      if (navigator.vibrate) navigator.vibrate(30);
+      showPasswordPrompt();
+    }, 1200);
+  }
+  function cancelPress(e) {
+    clearTimeout(pressTimer);
+  }
+  function handleClick(e) {
+    if (triggered) {
+      e.preventDefault();
+      e.stopPropagation();
+      triggered = false;
+    }
+  }
+
+  logo.addEventListener('touchstart', startPress, { passive: true });
+  logo.addEventListener('touchend', cancelPress);
+  logo.addEventListener('touchmove', cancelPress);
+  logo.addEventListener('mousedown', startPress);
+  logo.addEventListener('mouseup', cancelPress);
+  logo.addEventListener('mouseleave', cancelPress);
+  logo.addEventListener('click', handleClick);
+})();
+
+function showPasswordPrompt() {
+  document.getElementById('pwd-modal').classList.add('visible');
+  setTimeout(() => document.getElementById('pwd-input').focus(), 100);
+}
+
+function checkPassword() {
+  const input = document.getElementById('pwd-input').value;
+  if (input === 'Joselitoamado') {
+    editorUnlocked = true;
+    document.getElementById('pwd-modal').classList.remove('visible');
+    document.getElementById('pwd-input').value = '';
+    document.getElementById('pwd-error').style.opacity = '0';
+    toggleEditor();
+  } else {
+    const err = document.getElementById('pwd-error');
+    err.style.opacity = '1';
+    document.getElementById('pwd-input').value = '';
+    document.getElementById('pwd-input').focus();
+    setTimeout(() => err.style.opacity = '0', 2500);
+  }
+}
+
+function closePwdModal() {
+  document.getElementById('pwd-modal').classList.remove('visible');
+  document.getElementById('pwd-input').value = '';
+  document.getElementById('pwd-error').style.opacity = '0';
+}
+
+/* Populate article selector */
+function buildArticleSelect() {
+  const sel = document.getElementById('ed-article-select');
+  // Clear except home option
+  while (sel.options.length > 1) sel.remove(1);
+  articles.forEach((a, i) => {
+    const plainTitle = a.title.replace(/<[^>]+>/g, '');
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = (i + 1) + '. ' + plainTitle;
+    sel.appendChild(opt);
+  });
+  sel.value = editingIndex;
+}
+
+function loadArticleInEditor() {
+  const sel = document.getElementById('ed-article-select');
+  editingIndex = parseInt(sel.value);
+  const fields = document.getElementById('ed-fields');
+  fields.innerHTML = '';
+
+  if (editingIndex === -1) {
+    // HOME fields
+    fields.innerHTML = `
+      <div class="ed-group">
+        <label>Eyebrow (texto pequeño arriba)</label>
+        <input type="text" id="ef-eyebrow" value="${document.querySelector('.hero-eyebrow').textContent.trim()}">
+      </div>
+      <div class="ed-group">
+        <label>Título principal (usa | para salto de línea)</label>
+        <input type="text" id="ef-hero-title" value="${getHeroTitlePlain()}">
+      </div>
+      <div class="ed-group">
+        <label>Descripción</label>
+        <textarea id="ef-hero-desc" rows="3">${document.querySelector('.hero-desc').textContent.trim()}</textarea>
+      </div>
+    `;
+  } else {
+    // ARTICLE fields
+    const a = articles[editingIndex];
+    const plainTitle = a.title.replace(/<br>/g,'|').replace(/<em>/g,'*').replace(/<\/em>/g,'*');
+    fields.innerHTML = `
+      <div class="ed-group">
+        <label>Frecuencia / categoría</label>
+        <input type="text" id="ef-hz" value="${a.hz}">
+      </div>
+      <div class="ed-group">
+        <label>Título (usa | para salto, *texto* para cursiva dorada)</label>
+        <input type="text" id="ef-title" value="${plainTitle}">
+      </div>
+      <div class="ed-group">
+        <label>Fecha</label>
+        <input type="text" id="ef-date" value="${a.date}">
+      </div>
+      <div class="ed-group">
+        <label>Tiempo de lectura</label>
+        <input type="text" id="ef-read" value="${a.read}">
+      </div>
+      <div class="ed-group">
+        <label>Extracto (aparece en la lista)</label>
+        <textarea id="ef-excerpt" rows="3">${getExcerptForArticle(editingIndex)}</textarea>
+      </div>
+      <div class="ed-section">
+        <div class="ed-label" style="margin-bottom:12px">Contenido del artículo</div>
+        <div id="para-list"></div>
+        <div class="para-add-row" style="margin-top:10px">
+          <button class="para-add-btn" onclick="addPara('p')">+ Párrafo</button>
+          <button class="para-add-btn" onclick="addPara('h2')">+ Subtítulo</button>
+          <button class="para-add-btn" onclick="addPara('bq')">+ Cita</button>
+        </div>
+      </div>
+    `;
+    renderParaList(editingIndex);
+  }
+}
+
+function getHeroTitlePlain() {
+  const h = document.querySelector('.hero-title');
+  return h.innerHTML.replace(/<br>/g,'|').replace(/<em>/g,'*').replace(/<\/em>/g,'*').replace(/<[^>]+>/g,'').trim();
+}
+
+function getExcerptForArticle(i) {
+  // Extract from card in DOM or from articles data
+  const cards = document.querySelectorAll('.art-card .art-excerpt');
+  const feat = document.querySelector('.feat-excerpt');
+  if (i === 0 && feat) return feat.textContent.trim();
+  if (cards[i-1]) return cards[i-1] ? cards[i > 0 ? i-1 : 0].textContent.trim() : '';
+  return '';
+}
+
+/* ── PARAGRAPH EDITOR ── */
+// Parse article body HTML into editable blocks
+function parseBody(html) {
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  const blocks = [];
+  tmp.childNodes.forEach(node => {
+    if (node.nodeType !== 1) return;
+    const tag = node.tagName.toLowerCase();
+    if (tag === 'p') blocks.push({ type: 'p', text: node.innerHTML.replace(/<strong>/g,'**').replace(/<\/strong>/g,'**').replace(/<em>/g,'*').replace(/<\/em>/g,'*') });
+    else if (tag === 'h2') blocks.push({ type: 'h2', text: node.textContent });
+    else if (tag === 'blockquote') {
+      const p = node.querySelector('p');
+      blocks.push({ type: 'bq', text: p ? p.textContent : node.textContent });
+    }
+    else if (tag === 'div' && node.classList.contains('art-tags')) {
+      // skip tags div — preserve as-is
+      blocks.push({ type: 'tags', text: node.outerHTML });
+    }
+    else if (tag === 'div' && node.classList.contains('data-row')) {
+      blocks.push({ type: 'data', text: '[Tabla de datos — editar en código]' });
+    }
+    else if (tag === 'svg') {
+      blocks.push({ type: 'wave', text: '[Separador de onda]' });
+    }
+  });
+  return blocks;
+}
+
+function renderParaList(i) {
+  const a = articles[i];
+  const blocks = parseBody(a.body);
+  a._blocks = blocks; // cache
+  const list = document.getElementById('para-list');
+  if (!list) return;
+  list.innerHTML = '';
+  blocks.forEach((b, bi) => {
+    if (b.type === 'tags' || b.type === 'data' || b.type === 'wave') {
+      const item = document.createElement('div');
+      item.className = 'para-item';
+      item.innerHTML = `<div class="para-header"><span class="para-type-label">${{tags:'hashtags',data:'tabla de datos',wave:'separador'}[b.type]}</span><span style="font-size:9px;color:#4a4a52;font-family:monospace">Fijo</span></div>`;
+      list.appendChild(item);
+      return;
+    }
+    const typeLabels = { p: 'párrafo', h2: 'subtítulo', bq: 'cita destacada' };
+    const item = document.createElement('div');
+    item.className = 'para-item';
+    item.dataset.bi = bi;
+    item.innerHTML = `
+      <div class="para-header">
+        <span class="para-type-label">${typeLabels[b.type] || b.type}</span>
+        <button class="para-del" onclick="deletePara(${bi})" title="Eliminar">✕</button>
+      </div>
+      <div class="para-body">
+        <textarea rows="${b.type === 'p' ? 4 : 2}" onchange="updateBlock(${bi}, this.value)">${b.text}</textarea>
+      </div>
+    `;
+    list.appendChild(item);
+  });
+}
+
+function updateBlock(bi, val) {
+  if (editingIndex < 0) return;
+  articles[editingIndex]._blocks[bi].text = val;
+}
+
+function deletePara(bi) {
+  if (editingIndex < 0) return;
+  articles[editingIndex]._blocks.splice(bi, 1);
+  renderParaList(editingIndex);
+}
+
+function addPara(type) {
+  if (editingIndex < 0) return;
+  const a = articles[editingIndex];
+  if (!a._blocks) a._blocks = parseBody(a.body);
+  // Insert before tags block if present
+  const tagsIdx = a._blocks.findIndex(b => b.type === 'tags');
+  const insertAt = tagsIdx >= 0 ? tagsIdx : a._blocks.length;
+  a._blocks.splice(insertAt, 0, { type, text: type === 'h2' ? 'Nuevo subtítulo' : type === 'bq' ? '"Cita destacada."' : 'Escribe aquí tu nuevo párrafo.' });
+  renderParaList(editingIndex);
+}
+
+/* ── BLOCKS → HTML ── */
+function blocksToHTML(blocks) {
+  return blocks.map(b => {
+    if (b.type === 'tags' || b.type === 'data' || b.type === 'wave') return b.text;
+    let t = b.text
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>');
+    if (b.type === 'p') return `<p>${t}</p>`;
+    if (b.type === 'h2') return `<h2>${b.text}</h2>`;
+    if (b.type === 'bq') return `<blockquote><p>${b.text}</p></blockquote>`;
+    return '';
+  }).join('\n');
+}
+
+function parseTitle(raw) {
+  return raw
+    .replace(/\|/g, '<br>')
+    .replace(/\*([^*]+)\*/g, '<em>$1</em>');
+}
+
+/* ── SAVE ── */
+function saveArticle() {
+  if (editingIndex === -1) {
+    // Save home
+    const eyebrow = document.getElementById('ef-eyebrow').value;
+    const titleRaw = document.getElementById('ef-hero-title').value;
+    const desc = document.getElementById('ef-hero-desc').value;
+    document.querySelector('.hero-eyebrow').textContent = eyebrow;
+    document.querySelector('.hero-title').innerHTML = parseTitle(titleRaw);
+    document.querySelector('.hero-desc').textContent = desc;
+  } else {
+    const a = articles[editingIndex];
+    const hz = document.getElementById('ef-hz').value;
+    const titleRaw = document.getElementById('ef-title').value;
+    const date = document.getElementById('ef-date').value;
+    const read = document.getElementById('ef-read').value;
+    const excerpt = document.getElementById('ef-excerpt').value;
+
+    a.hz = hz;
+    a.title = parseTitle(titleRaw);
+    a.date = date;
+    a.read = read;
+
+    // Save blocks to body
+    if (a._blocks) {
+      a.body = blocksToHTML(a._blocks);
+    }
+
+    // Update DOM cards
+    updateCardInDOM(editingIndex, hz, a.title, excerpt);
+
+    // If article is currently open, re-render it
+    if (!document.getElementById('home-view').classList.contains('active')) {
+      openArticle(editingIndex);
+    }
+  }
+
+  showToast('✓ Cambios guardados');
+}
+
+function updateCardInDOM(i, hz, title, excerpt) {
+  const cards = document.querySelectorAll('.art-card');
+  // Featured is index 0
+  if (i === 0) {
+    const feat = document.querySelector('.feat-card');
+    if (feat) {
+      feat.querySelector('.feat-hz').textContent = hz;
+      feat.querySelector('.feat-title').innerHTML = title;
+      feat.querySelector('.feat-excerpt').textContent = excerpt;
+    }
+  }
+  // Grid cards (0→feat, 1→cards[0], etc.)
+  const gridIndex = i > 0 ? i - 1 : null;
+  if (gridIndex !== null && cards[gridIndex]) {
+    cards[gridIndex].querySelector('.art-hz').textContent = hz;
+    cards[gridIndex].querySelector('.art-title').innerHTML = title;
+    cards[gridIndex].querySelector('.art-excerpt').textContent = excerpt;
+  }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('ed-toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+/* ── EXPORT HTML ── */
+function exportHTML() {
+  try {
+    // Serialize current articles data into a new script block
+    const serialized = JSON.stringify(articles.map(a => ({
+      hz: a.hz,
+      title: a.title,
+      date: a.date,
+      read: a.read,
+      body: a._blocks ? blocksToHTML(a._blocks) : a.body
+    })), null, 2);
+
+    // Get the page source and replace the articles array
+    const source = document.documentElement.outerHTML;
+    const updated = source.replace(
+      /const articles = \[[\s\S]*?\];/,
+      'const articles = ' + serialized + ';'
+    );
+
+    const blob = new Blob([updated], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'blog-spidimxnrr.html';
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    showToast('✓ Archivo descargado');
+  } catch (err) {
+    showToast('✗ Error: ' + err.message);
+    // Fallback: open in new tab so the person can save manually
+    try {
+      const serialized2 = JSON.stringify(articles.map(a => ({
+        hz: a.hz, title: a.title, date: a.date, read: a.read,
+        body: a._blocks ? blocksToHTML(a._blocks) : a.body
+      })), null, 2);
+      const source2 = document.documentElement.outerHTML;
+      const updated2 = source2.replace(/const articles = \[[\s\S]*?\];/, 'const articles = ' + serialized2 + ';');
+      const blob2 = new Blob([updated2], { type: 'text/html;charset=utf-8' });
+      const url2 = URL.createObjectURL(blob2);
+      window.open(url2, '_blank');
+    } catch (e2) {}
+  }
+}
+
+function openHTMLInTab() {
+  try {
+    const serialized = JSON.stringify(articles.map(a => ({
+      hz: a.hz,
+      title: a.title,
+      date: a.date,
+      read: a.read,
+      body: a._blocks ? blocksToHTML(a._blocks) : a.body
+    })), null, 2);
+    const source = document.documentElement.outerHTML;
+    const updated = source.replace(
+      /const articles = \[[\s\S]*?\];/,
+      'const articles = ' + serialized + ';'
+    );
+    const blob = new Blob([updated], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
+    showToast('✓ Abierto en pestaña nueva');
+  } catch (err) {
+    showToast('✗ Error: ' + err.message);
+  }
+}
+
+/* ══════════════════════════════
+   RADIO EN VIVO
+══════════════════════════════ */
+
+const radioAudio = document.getElementById('radio-audio');
+const radioPlayBtn = document.getElementById('radio-play');
+const radioPlayIcon = document.getElementById('radio-play-icon');
+const radioStatus = document.getElementById('radio-status');
+const radioMuteBtn = document.getElementById('radio-mute');
+let radioPlaying = false;
+let lastVolume = 0.8;
+
+function toggleRadio() {
+  if (!radioPlaying) {
+    radioStatus.textContent = 'conectando...';
+    radioAudio.play().then(() => {
+      radioPlaying = true;
+      radioPlayIcon.textContent = '❙❙';
+      radioStatus.textContent = 'spidimxnrr radio';
+    }).catch(() => {
+      radioStatus.textContent = 'no se pudo conectar';
+      radioPlaying = false;
+      radioPlayIcon.textContent = '▶';
+    });
+  } else {
+    radioAudio.pause();
+    radioPlaying = false;
+    radioPlayIcon.textContent = '▶';
+    radioStatus.textContent = 'spidimxnrr radio';
+  }
+}
+
+function setRadioVolume(val) {
+  radioAudio.volume = parseFloat(val);
+  lastVolume = parseFloat(val);
+  radioMuteBtn.textContent = parseFloat(val) === 0 ? '🔇' : '🔊';
+}
+
+function toggleMute() {
+  if (radioAudio.volume > 0) {
+    lastVolume = radioAudio.volume;
+    radioAudio.volume = 0;
+    document.getElementById('radio-volume').value = 0;
+    radioMuteBtn.textContent = '🔇';
+  } else {
+    radioAudio.volume = lastVolume || 0.8;
+    document.getElementById('radio-volume').value = radioAudio.volume;
+    radioMuteBtn.textContent = '🔊';
+  }
+}
+
+radioAudio.addEventListener('error', () => {
+  radioStatus.textContent = 'stream no disponible';
+  radioPlaying = false;
+  radioPlayIcon.textContent = '▶';
+});
+
+radioAudio.volume = 0.8;
+</script>
